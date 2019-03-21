@@ -1,0 +1,64 @@
+$primary-color: black;
+$bg: white;
+
+//@import "box-reset.css";
+
+body {
+  color: $primary-color;
+  background-color: $bg;
+}
+
+button {
+  margin: 0 10px 0 0;
+}
+
+#train {
+
+}
+
+.stats {
+  label {
+    font-weight: normal;  
+  }
+}
+label {
+  display: inline-block;
+  font-weight: normal;
+  width: 100px;
+  padding: 6px 0 6px 0;
+}
+.canvases {
+  display: inline-block;
+}
+
+#images {
+
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  align-items: flex-start;
+
+  .pred-container {
+    display: inline-block;
+    width: 75px;
+    margin: 10px;
+  
+    .prediction-canvas {
+      width: 75px;
+    }
+    .pred {
+      font-size: 20px;
+      line-height: 25px;
+      width: 100px;
+  
+      &.pred-correct {
+        background-color: #00cf00;
+      }
+      &.pred-incorrect {
+        background-color: red;
+      }
+    }
+  }
+  
+}
