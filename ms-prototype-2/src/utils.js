@@ -2,14 +2,16 @@
  * Tensorflow.js Examples Utility functions for the visualize-convnet
  */
 
-import * as jimp from "jimp";
-import * as tf from '@tensorflow/tfjs';
+//import * as fs from "fs";
+//var jimp = require('jimp');
 
+import * as jimp from 'jimp';
+import * as tf from '@tensorflow/tfjs';
 /**
  * Read an image file as a TensorFlow.js tensor.
  * 
  */
-async function readImageTensorFromFile(filePath, height, width) {
+export async function readImageTensorFromFile(filePath, height, width) {
     return new Promise((resolve, reject) => {
       jimp.read(filePath, (err, image) => {
         if (err) {
@@ -34,7 +36,8 @@ async function readImageTensorFromFile(filePath, height, width) {
  * Write an image tensor to a image file.
  */
 
-async function writeImageTensorToFile(imageTensor, filePath) {
+export async function writeImageTensorToFile(imageTensor, filePath, activationsDiv) {
+  console.log(filePath)
     const imageH = imageTensor.shape[1];
     const imageW = imageTensor.shape[2];
     const imageData = imageTensor.dataSync();
@@ -51,22 +54,33 @@ async function writeImageTensorToFile(imageTensor, filePath) {
         buffer.set([255], index++);
       }
     }
-  
+
     return new Promise((resolve, reject) => {
+  
       new jimp(
-          {data: new Buffer(buffer), width: imageW, height: imageH},
+          {data: new Buffer(buffer, 'base64'), width: imageW, height: imageH},
           (err, img) => {
+
             if (err) {
               reject(err);
+
             } else {
-              img.write(filePath);
+              
+              
+              img.getBase64(Jimp.AUTO, function (err, src) {
+
+                
+                // var img = document.createElement("img");
+                // img.setAttribute("src", src);
+                // activationsDiv.appendChild(img);
+                
+                //fs.writeFile(filePath, src, function(err){ console.log(err)})
+              })
+              
+
+              //img.write(filePath);
               resolve();
             }
           });
     });
   }
-
-  module.exports = {
-    readImageTensorFromFile,
-    writeImageTensorToFile
-  };

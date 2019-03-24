@@ -3,8 +3,9 @@ import "babel-polyfill";
 
 import * as tf from '@tensorflow/tfjs';
 import * as tfvis from '@tensorflow/tfjs-vis';
+import { processing } from "./main.js"
 
-console.log(tf.version);
+/** INDEX.JS **/
 
 $("#image-selector").change(function () {
     let reader = new FileReader();
@@ -34,13 +35,26 @@ async function loadModel(name) {
 
 $('#predict-button').click(async function() {
     let image = $('#selected-image').get(0);
-    let modelName = $("#model-selector").val();
 
-    let origTensor = tf.browser.fromPixels(image);
-    origTensor = origTensor.resizeNearestNeighbor([100, 100]);
-    let tensor = origTensor.resizeNearestNeighbor([224, 224]).toFloat();
+    let tensor = tf.browser.fromPixels(image);
+    let tensor1 = tensor.resizeNearestNeighbor([100, 100]);
+    tensor = tensor.resizeNearestNeighbor([224, 224]).toFloat();
     //.expandDims();
+    let processedTensor = getProcessedTensor(tensor);
+    let predictions = await model.predict(processedTensor).data();
 
+    //testVis(tensor1);
+    showPredictions(predictions);
+
+    const activationsDiv = document.querySelector('.activations');
+    activationsDiv.innerHTML = '';
+    processing(model, tensor, activationsDiv);
+    
+    tensor.dispose();
+    processedTensor.dispose();
+});
+
+function getProcessedTensor(tensor) {
     // More pre-processing
     let meanImageNetRGB = {
         red: 123.68,
@@ -74,7 +88,10 @@ $('#predict-button').click(async function() {
         .reverse(2)
         .expandDims();
 
-    let predictions = await model.predict(processedTensor).data();
+    return processedTensor;
+}
+
+function showPredictions(predictions) {
     let top5 = Array.from(predictions)
         .map(function (p, i) {
             return {
@@ -89,25 +106,24 @@ $('#predict-button').click(async function() {
     top5.forEach((p) => {
         $('#prediction-list').append(`<li>${p.className}: ${p.probability.toFixed(6)}</li>`);
     });
+}
 
+async function testVis() {
     // Get a surface
     const surface = tfvis.visor().surface({ name: 'Surface', tab: 'Image from Tensor' });
     const drawArea = surface.drawArea;
 
     const canvas = document.createElement('canvas');
     canvas.getContext('2d');
-    canvas.width = tensor[0];
-    canvas.height = tensor[1];
+    canvas.width = origTensor[0];
+    canvas.height = origTensor[1];
     canvas.style = 'margin: 4px;';
     await tf.browser.toPixels(origTensor, canvas);
     drawArea.appendChild(canvas);
-
-    tensor.dispose();
-    processedTensor.dispose();
-})
+}
 
 async function showModel() {
-
+    
     const visorInstance = tfvis.visor();
       //console.log(visorInstance)
       if (!visorInstance.isOpen()) {
@@ -124,13 +140,11 @@ async function showModel() {
 
 document.querySelector('#show-metrics')
     .addEventListener('click', showModel);
+    
 
 function setupListeners() {
     
 }
-
-
-
 
 function setup () {
     setupListeners();

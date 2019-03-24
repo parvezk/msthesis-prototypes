@@ -3,12 +3,8 @@
  * https://github.com/fchollet/deep-learning-with-python-notebooks/blob/master/5.4-visualizing-what-convnets-learn.ipynb
  */
 
- import * as argparse from "argparse";
- import * as fs from "fs";
- import * as path from "path";
- import * as shelljs from "shelljs"
  import * as tf from "@tensorflow/tfjs";
-
+ import {writeInternalActivationAndGetOutput} from "./filters"
 
  /**
  * Calcuate and save the maximally-activating input images for a covn2d layer.
@@ -18,20 +14,20 @@
      layerNames: "block1_conv1,block2_conv1,block3_conv2,block4_conv2,block5_conv3",
      filters: 8,
      inputImage: "",
-     outputDir: "dist/activation"
+     outputDir: "./dist/activation"
  }
 
- async function processing(model, inputTensor) {
+export async function processing(model, inputTensor, activationsDiv) {
 
-    const x = inputTensor;
-    const { layerNames, filters, outputDir } = CONFIG;
+    const imageHeight = model.inputs[0].shape[1];
+    const imageWidth = model.inputs[0].shape[2];
+    const { filters, outputDir } = CONFIG;
 
-    const layerNames = args.convLayerNames.split(',');
+    let x = inputTensor.resizeNearestNeighbor([imageHeight, imageWidth]);
+    x = x.reshape([1, x.shape[0], x.shape[1], x.shape[2]]);
+    //x = x.as4D([1, x.shape.length[0], x.shape.length[1], x.shape.length[2]]);
+    const layerNames = CONFIG.layerNames.split(',');
 
-    await filters.writeInternalActivationAndGetOutput(
-        model, layerNames, x, filters, outputDir);
+    await writeInternalActivationAndGetOutput(
+        model, layerNames, x, filters, outputDir, activationsDiv);
  }
-
- module.exports = {
-    processing
-  };

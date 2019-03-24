@@ -6,3 +6,13 @@ body {
 }
 
 .hide {display: none; }
+
+.activations {
+  display: flex;
+  flex-direction: rows;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  align-content: flex-start;
+
+}
