@@ -1,18 +1,141 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans); 
+
 $primary-color: black;
 $bg: white;
+
 body {
   color: $primary-color;
   background-color: $bg;
+  font-family: "Open Sans", sans-serif;
+  color: #282828;
 }
 
 .hide {display: none; }
 
+.sub-title{ padding-left: 0;}
+
+#selected-image{
+  width: 70%;
+}
+
+.content {
+  font-size: 14px;
+}
+
+/////////////////////////////
+
 .activations {
   display: flex;
-  flex-direction: rows;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  align-content: flex-start;
+  flex-direction: column;
 
+  .activations-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    align-content: flex-start;
+
+    img {
+      margin: 5px;
+    }
+  }
+
+}
+
+
+
+
+/**** CHART *****/
+
+@mixin stagger-anim-delay($i, $initial-delay, $stagger-delay) {
+  @while $i > 0 {
+    &:nth-of-type(#{$i}) {
+      animation-delay: $initial-delay + $stagger-delay * $i;
+    }
+    $i: $i - 1;
+  }
+}
+
+.charts {
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 10;
+}
+
+.chart {
+  margin: 30px 0 0;
+
+  &:first-child {
+    margin: 0;
+  }
+}
+
+.chart--horiz {
+  overflow: hidden;
+  list-style: none;
+  padding-left: 0;
+}
+
+//Keyframes
+@keyframes anim-lightspeed-in {
+  0% {
+    transform: translateX(-200%);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.chart__bar {
+  position: relative;
+  
+  width: 100%;
+  
+  height: 30px;
+  margin-bottom: 10px;
+}
+
+.trans{
+  position: absolute;
+  opacity: 0;
+  z-index: 0;
+  $border-rad: 4px;
+  background: #3cd3ad;
+
+  //background: linear-gradient(to left, #4cb8c4, #3cd3ad);
+  border-top-right-radius: $border-rad;
+  border-bottom-right-radius: $border-rad;
+
+  animation: 1s anim-lightspeed-in ease forwards;
+
+  .chart--dev & {
+    @include stagger-anim-delay(11, 0.5s, 0.2s);
+  }
+  .chart--prod & {
+    @include stagger-anim-delay(2, 3.8s, 0.2s);
+  }
+  .chart--design & {
+    @include stagger-anim-delay(3, 5s, 0.2s);
+  }
+}
+.chart__label {
+  position: absolute;
+  z-index: 1;
+  width: 80%;
+  padding-left: 10px;
+  line-height: 30px;
+  color: black;
+
+  span:first-child {
+    float: left;
+  }
+
+  span:last-child {
+    float: right;
+  }
 }

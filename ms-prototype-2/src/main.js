@@ -14,10 +14,10 @@
      layerNames: "block1_conv1,block2_conv1,block3_conv2,block4_conv2,block5_conv3",
      filters: 8,
      inputImage: "",
-     outputDir: "./dist/activation"
+     outputDir: "activation"
  }
 
-export async function processing(model, inputTensor, activationsDiv) {
+export async function activations(model, inputTensor, activationsDiv) {
 
     const imageHeight = model.inputs[0].shape[1];
     const imageWidth = model.inputs[0].shape[2];

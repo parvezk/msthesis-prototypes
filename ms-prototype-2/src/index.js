@@ -3,7 +3,7 @@ import "babel-polyfill";
 
 import * as tf from '@tensorflow/tfjs';
 import * as tfvis from '@tensorflow/tfjs-vis';
-import { processing } from "./main.js"
+import { activations } from "./main.js"
 
 /** INDEX.JS **/
 
@@ -12,7 +12,6 @@ $("#image-selector").change(function () {
     reader.onload = function () {
         let dataURL = reader.result;
         $("#selected-image").attr("src", dataURL);
-        $("#prediction-list").empty();
     }
     let file = $("#image-selector").prop("files")[0];
     reader.readAsDataURL(file);
@@ -33,11 +32,12 @@ async function loadModel(name) {
     progressBar.classList.add("hide");
 }
 
+let tensor, tensor1;
 $('#predict-button').click(async function() {
     let image = $('#selected-image').get(0);
 
-    let tensor = tf.browser.fromPixels(image);
-    let tensor1 = tensor.resizeNearestNeighbor([100, 100]);
+    tensor = tf.browser.fromPixels(image);
+    tensor1 = tensor.resizeNearestNeighbor([100, 100]);
     tensor = tensor.resizeNearestNeighbor([224, 224]).toFloat();
     //.expandDims();
     let processedTensor = getProcessedTensor(tensor);
@@ -46,9 +46,7 @@ $('#predict-button').click(async function() {
     //testVis(tensor1);
     showPredictions(predictions);
 
-    const activationsDiv = document.querySelector('.activations');
-    activationsDiv.innerHTML = '';
-    processing(model, tensor, activationsDiv);
+    //ENABLE BUTTONS
     
     tensor.dispose();
     processedTensor.dispose();
@@ -102,10 +100,38 @@ function showPredictions(predictions) {
             return b.probability - a.probability;
         }).slice(0, 5);
     
-    $('#prediction-list').empty();
-    top5.forEach((p) => {
-        $('#prediction-list').append(`<li>${p.className}: ${p.probability.toFixed(6)}</li>`);
-    });
+        var el = document.querySelector('#prediction-list');
+    
+        var children = el.children,
+        number_of_children = children.length;
+        console.log(number_of_children)
+    
+        for (var i=0; i<number_of_children; i++) {
+            const text = children[i].children[1].children;
+            text[0].innerHTML = top5[i].className;
+            text[1].innerHTML = top5[i].probability.toFixed(6);
+        }
+}
+
+function getActivations() {
+    const activationsDiv = document.querySelector('.activations');
+    activationsDiv.innerHTML = '';
+    // Generate Activations
+    if (model && tensor)
+        activations(model, tensor, activationsDiv);
+}
+
+
+function setupListeners() {
+
+    document.querySelector('#show-metrics')
+    .addEventListener('click', showModel);
+    
+    document.querySelector('#activation-btn')
+    .addEventListener('click', getActivations());
+}
+
+function run() {
 }
 
 async function testVis() {
@@ -136,27 +162,11 @@ async function showModel() {
     };
     tfvis.show.modelSummary(surface, model);
   }
-
-
-document.querySelector('#show-metrics')
-    .addEventListener('click', showModel);
     
-
-function setupListeners() {
-    
-}
-
-function setup () {
-    setupListeners();
-}
-
-function run() {
-}
-
 // EVENT HANDLERS
 document
 .addEventListener('DOMContentLoaded', () => {
-    setup();
+    setupListeners();
     run();
 });
 

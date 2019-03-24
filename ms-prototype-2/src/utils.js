@@ -7,6 +7,23 @@
 
 import * as jimp from 'jimp';
 import * as tf from '@tensorflow/tfjs';
+
+var fs = require('fs');
+const Jimp = require('jimp/browser/lib/jimp');
+
+
+BrowserFS.install(window);
+  // Configures BrowserFS to use the LocalStorage file system.
+  BrowserFS.configure({
+    fs: "LocalStorage"
+  }, function(e) {
+    if (e) {
+      // An error happened!
+      throw e;
+    }
+    // Otherwise, BrowserFS is ready-to-use!
+  });
+
 /**
  * Read an image file as a TensorFlow.js tensor.
  * 
@@ -36,8 +53,8 @@ export async function readImageTensorFromFile(filePath, height, width) {
  * Write an image tensor to a image file.
  */
 
-export async function writeImageTensorToFile(imageTensor, filePath, activationsDiv) {
-  console.log(filePath)
+export async function writeImageTensorToFile(imageTensor, filePath, row) {
+  //console.log(filePath)
     const imageH = imageTensor.shape[1];
     const imageW = imageTensor.shape[2];
     const imageData = imageTensor.dataSync();
@@ -70,12 +87,12 @@ export async function writeImageTensorToFile(imageTensor, filePath, activationsD
               img.getBase64(Jimp.AUTO, function (err, src) {
 
                 
-                // var img = document.createElement("img");
-                // img.setAttribute("src", src);
-                // activationsDiv.appendChild(img);
-                
+                var img = document.createElement("img");
+                img.setAttribute("src", src);
+                row.appendChild(img);
+
                 //fs.writeFile(filePath, src, function(err){ console.log(err)})
-              })
+              });
               
 
               //img.write(filePath);

@@ -1,6 +1,8 @@
 const webpack = require('webpack');
 const path = require('path');
 
+var browserfs = require('browserfs');
+
 const config = {
   //target: "web",
   entry: './src/index.js',
@@ -9,6 +11,7 @@ const config = {
     filename: 'bundle.js'
   },
   module: {
+    noParse: /browserfs\.js/,
     rules: [
       {
         test: /\.(js|jsx)$/,
@@ -40,9 +43,18 @@ const config = {
       }
     ]
   },
+  plugins: [
+    // Expose BrowserFS, process, and Buffer globals.
+    // NOTE: If you intend to use BrowserFS in a script tag, you do not need
+    // to expose a BrowserFS global.
+    new webpack.ProvidePlugin({ BrowserFS: 'bfsGlobal', process: 'processGlobal', Buffer: 'bufferGlobal' })
+  ],
+  node: {
+    process: false,
+    Buffer: false
+  },
   resolve: {
-     // Use our versions of Node modules.
-     alias: {
+    alias: {
       'fs': 'browserfs/dist/shims/fs.js',
       'buffer': 'browserfs/dist/shims/buffer.js',
       'path': 'browserfs/dist/shims/path.js',

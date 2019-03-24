@@ -30,6 +30,10 @@ export async function writeInternalActivationAndGetOutput(
     for (let i = 0; i < outputs.length - 1; ++i) {
         const layerName = layerNames[i];
         // Split the activation of the convolutional layer by filter.
+
+        var row = document.createElement("div");
+        row.classList.add('activations-row');
+        activationsDiv.appendChild(row);
     
         //console.log('SPLIT');
         const activationTensors = tf.split(outputs[i], outputs[i].shape[outputs[i].shape.length - 1], -1);
@@ -45,7 +49,7 @@ export async function writeInternalActivationAndGetOutput(
           const imageTensor = tf.tidy(() => deprocessImage(tf.tile(activationTensors[j], [1, 1, 1, 3])));
           const outputFilePath = path.join(outputDir, `${layerName}_${j + 1}.png`);
           filePaths.push(outputFilePath);
-          writeImageTensorToFile(imageTensor, outputFilePath, activationsDiv);
+          writeImageTensorToFile(imageTensor, outputFilePath, row);
           imageTensorShape = imageTensor.shape;
 
           
