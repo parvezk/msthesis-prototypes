@@ -3,7 +3,9 @@ import "babel-polyfill";
 
 import * as tf from '@tensorflow/tfjs';
 import * as tfvis from '@tensorflow/tfjs-vis';
-import { activations } from "./main.js"
+import {
+    internalActivations, ClassActivationMaps
+} from "./main.js"
 
 /** INDEX.JS **/
 
@@ -33,7 +35,7 @@ async function loadModel(name) {
 }
 
 let tensor, tensor1;
-$('#predict-button').click(async function() {
+$('#predict-button').click(async function () {
     let image = $('#selected-image').get(0);
 
     tensor = tf.browser.fromPixels(image);
@@ -47,9 +49,9 @@ $('#predict-button').click(async function() {
     showPredictions(predictions);
 
     //ENABLE BUTTONS
-    
-    tensor.dispose();
-    processedTensor.dispose();
+
+    //tensor.dispose();
+    //processedTensor.dispose();
 });
 
 function getProcessedTensor(tensor) {
@@ -65,7 +67,7 @@ function getProcessedTensor(tensor) {
         tf.tensor1d([1], "int32"),
         tf.tensor1d([2], "int32")
     ];
-    
+
     // Centering the RGB values
     let centeredRGB = {
         red: tf.gather(tensor, indices[0], 2)
@@ -80,8 +82,8 @@ function getProcessedTensor(tensor) {
     };
     // Stacking, reversing, and reshaping
     let processedTensor = tf.stack([
-        centeredRGB.red, centeredRGB.green, centeredRGB.blue
-    ], 1)
+            centeredRGB.red, centeredRGB.green, centeredRGB.blue
+        ], 1)
         .reshape([224, 224, 3])
         .reverse(2)
         .expandDims();
@@ -99,44 +101,58 @@ function showPredictions(predictions) {
         }).sort(function (a, b) {
             return b.probability - a.probability;
         }).slice(0, 5);
-    
-        var el = document.querySelector('#prediction-list');
-    
-        var children = el.children,
+
+    var el = document.querySelector('#prediction-list');
+
+    var children = el.children,
         number_of_children = children.length;
-        console.log(number_of_children)
-    
-        for (var i=0; i<number_of_children; i++) {
-            const text = children[i].children[1].children;
-            text[0].innerHTML = top5[i].className;
-            text[1].innerHTML = top5[i].probability.toFixed(6);
-        }
+
+    for (var i = 0; i < number_of_children; i++) {
+        const text = children[i].children[1].children;
+        text[0].innerHTML = top5[i].className;
+        text[1].innerHTML = top5[i].probability.toFixed(6);
+    }
 }
 
+// Generate Internal Activations
 function getActivations() {
-    const activationsDiv = document.querySelector('.activations');
+    console.log('ACTIVATIONS')
+    const activationsDiv = document.querySelector('#activations');
     activationsDiv.innerHTML = '';
-    // Generate Activations
     if (model && tensor)
-        activations(model, tensor, activationsDiv);
+        internalActivations(model, tensor, activationsDiv);
+}
+
+// Generate Activation map on input image
+function getActivationMaps() {
+    console.log('MAPS')
+    const camDiv = document.querySelector('#cam');
+    camDiv.innerHTML = '';
+    if (model && tensor)
+        ClassActivationMaps(model, tensor, camDiv);
 }
 
 
 function setupListeners() {
-
+    console.log('CALLED')
     document.querySelector('#show-metrics')
-    .addEventListener('click', showModel);
-    
+        .addEventListener('click', showModel);
+
     document.querySelector('#activation-btn')
-    .addEventListener('click', getActivations());
+        .addEventListener('click', getActivations);
+
+    document.querySelector('#heatmap-btn')
+        .addEventListener('click', getActivationMaps);
 }
 
-function run() {
-}
+function run() {}
 
 async function testVis() {
     // Get a surface
-    const surface = tfvis.visor().surface({ name: 'Surface', tab: 'Image from Tensor' });
+    const surface = tfvis.visor().surface({
+        name: 'Surface',
+        tab: 'Image from Tensor'
+    });
     const drawArea = surface.drawArea;
 
     const canvas = document.createElement('canvas');
@@ -149,25 +165,25 @@ async function testVis() {
 }
 
 async function showModel() {
-    
+
     const visorInstance = tfvis.visor();
-      //console.log(visorInstance)
-      if (!visorInstance.isOpen()) {
+    //console.log(visorInstance)
+    if (!visorInstance.isOpen()) {
         visorInstance.toggle();
-      }
+    }
 
     const surface = {
-      name: 'Model Summary',
-      tab: 'Model'
+        name: 'Model Summary',
+        tab: 'Model'
     };
     tfvis.show.modelSummary(surface, model);
-  }
-    
+}
+
 // EVENT HANDLERS
 document
-.addEventListener('DOMContentLoaded', () => {
-    setupListeners();
-    run();
-});
+    .addEventListener('DOMContentLoaded', () => {
+        setupListeners();
+        run();
+    });
 
 modelSelect.addEventListener('change', run);

@@ -8,7 +8,7 @@
 
 import * as path from "path";
 import * as tf from "@tensorflow/tfjs";
-import { readImageTensorFromFile, writeImageTensorToFile} from "./utils";
+import * as utils from "./utils";
 
 export async function writeInternalActivationAndGetOutput(
     model, layerNames, inputImage, numFilters, outputDir, activationsDiv) {
@@ -31,9 +31,9 @@ export async function writeInternalActivationAndGetOutput(
         const layerName = layerNames[i];
         // Split the activation of the convolutional layer by filter.
 
-        var row = document.createElement("div");
-        row.classList.add('activations-row');
-        activationsDiv.appendChild(row);
+        var container = document.createElement("div");
+        container.classList.add('activations-row');
+        activationsDiv.appendChild(container);
     
         //console.log('SPLIT');
         const activationTensors = tf.split(outputs[i], outputs[i].shape[outputs[i].shape.length - 1], -1);
@@ -49,7 +49,7 @@ export async function writeInternalActivationAndGetOutput(
           const imageTensor = tf.tidy(() => deprocessImage(tf.tile(activationTensors[j], [1, 1, 1, 3])));
           const outputFilePath = path.join(outputDir, `${layerName}_${j + 1}.png`);
           filePaths.push(outputFilePath);
-          writeImageTensorToFile(imageTensor, outputFilePath, row);
+          utils.writeImageTensorToFile(imageTensor, outputFilePath, container);
           imageTensorShape = imageTensor.shape;
 
           
