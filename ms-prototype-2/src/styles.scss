@@ -10,21 +10,80 @@ body {
   color: #282828;
 }
 
+main {
+  background: aliceblue;
+}
+
+.layout {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: nowrap;
+}
+
+.container-fluid {
+  width: 100%;
+    max-width: 100%;
+    flex: 1 1 100%;
+    margin: auto;
+    padding: 24px;
+}
+
+.content {
+  font-size: 14px;
+  margin: 0 auto;
+}
+
+.wrap {
+  display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 0 auto;
+    padding: 0;
+    position: relative;
+    height: 100%;
+    
+}
+
+.control-bar {
+    width: 80%;
+    margin: auto;
+    font-size: 14px;
+    padding: 0 30px;
+    display: flex;
+    //flex: 1 1 auto;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    justify-content: space-evenly;
+}
+
+.hero-area {
+  width: 85%;
+    display: flex;
+    padding: 40px 0 40px 0;
+    flex-wrap: wrap;
+    margin: auto;
+    position: relative;
+    background: #fff;
+    box-shadow: 0 2px 1px -1px rgba(0,0,0,.2),0 1px 1px 0 rgba(0,0,0,.14),0 1px 3px 0 rgba(0,0,0,.12)!important;
+    height: 100%;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+
 .hide {display: none; }
 
+// header
 .sub-title{ padding-left: 0;}
 
 #selected-image{
   width: 70%;
 }
 
-.content {
-  font-size: 14px;
-}
-
 /////////////////////////////
 
-.activations {
+#activations {
   display: flex;
   flex-direction: column;
 
@@ -35,6 +94,7 @@ body {
     flex-wrap: nowrap;
     align-items: flex-start;
     align-content: flex-start;
+    overflow: overlay;
 
     img {
       margin: 5px;
@@ -42,9 +102,6 @@ body {
   }
 
 }
-
-
-
 
 /**** CHART *****/
 
@@ -127,15 +184,22 @@ body {
   position: absolute;
   z-index: 1;
   width: 80%;
-  padding-left: 10px;
+  padding-left: 0;
+  margin: 0;
   line-height: 30px;
   color: black;
 
-  span:first-child {
+  div:first-child {
+    width: 40%;
     float: left;
+    text-align: right;
   }
 
-  span:last-child {
+  div:last-child {
+    width: 60%;
+    text-align: right;
+    margin: 0;
+    padding: 0;
     float: right;
   }
 }

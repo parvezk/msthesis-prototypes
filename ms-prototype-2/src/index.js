@@ -49,7 +49,6 @@ $('#predict-button').click(async function () {
     showPredictions(predictions);
 
     //ENABLE BUTTONS
-
     //tensor.dispose();
     //processedTensor.dispose();
 });
@@ -109,8 +108,10 @@ function showPredictions(predictions) {
 
     for (var i = 0; i < number_of_children; i++) {
         const text = children[i].children[1].children;
-        text[0].innerHTML = top5[i].className;
-        text[1].innerHTML = top5[i].probability.toFixed(6);
+        const prob = top5[i].probability.toFixed(6);
+        
+        text[0].innerHTML = top5[i].className.split(',')[0]
+        text[1].innerHTML = Math.floor(prob * 100) / 100;
     }
 }
 
@@ -125,7 +126,6 @@ function getActivations() {
 
 // Generate Activation map on input image
 function getActivationMaps() {
-    console.log('MAPS')
     const camDiv = document.querySelector('#cam');
     camDiv.innerHTML = '';
     if (model && tensor)
@@ -134,7 +134,6 @@ function getActivationMaps() {
 
 
 function setupListeners() {
-    console.log('CALLED')
     document.querySelector('#show-metrics')
         .addEventListener('click', showModel);
 
