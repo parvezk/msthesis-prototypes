@@ -28,9 +28,11 @@ main {
     padding: 24px;
 }
 
-.content {
+.content, .viz {
   font-size: 14px;
+  width: 85%;
   margin: 0 auto;
+  padding: 10px 0 0 0;
 }
 
 .wrap {
@@ -39,10 +41,13 @@ main {
     flex-wrap: wrap;
     justify-content: center;
     margin: 0 auto;
-    padding: 0;
+    padding: 20px 0 00px 0;
     position: relative;
     height: 100%;
-    
+}
+
+.wrap li {
+  padding: 0 0 10px 0;
 }
 
 .control-bar {
@@ -75,13 +80,27 @@ main {
 .hide {display: none; }
 
 // header
-.sub-title{ padding-left: 0;}
+.sub-title { padding-left: 0;}
 
-#selected-image{
-  width: 70%;
-}
+#selected-image { width: 70% }
 
 /////////////////////////////
+
+.viz {
+  padding: 20px 0;
+}
+
+.viz-container {
+  
+}
+
+
+.viz-section {
+  padding: 20px 0;
+  h5 {
+    padding: 0 0 20px 0;
+  }
+}
 
 #activations {
   display: flex;
