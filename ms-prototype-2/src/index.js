@@ -117,15 +117,15 @@ function showPredictions(predictions) {
     }
 }
 
-//const progressBar2 = document.querySelector('#progress-bar-2');
-//const progressBar3 = document.querySelector('#progress-bar-3');
+const progressBar2 = document.querySelector('#progress-bar-2');
+const progressBar3 = document.querySelector('#progress-bar-3');
 let infer1, infer2;
 
 // Generate Internal Activations
 async function getActivations() {
     console.log('Loading activations..')
     const activationsDiv = document.querySelector('#activations');
-    //progressBar2.classList.remove("hide");
+    progressBar2.classList.remove("hide");
     activationsDiv.innerHTML = '';
     if (model && tensor) {
         infer1 = await internalActivations(model, tensor, activationsDiv);
