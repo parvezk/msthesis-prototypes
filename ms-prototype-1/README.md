@@ -1,6 +1,6 @@
 # Thesis-prototype-1
 
-Thesis Prototype 1
+MS Thesis Prototype 1
 
 ## Building and running on localhost
 
