@@ -24,7 +24,7 @@ $("#model-selector").change(function () {
     loadModel($("#model-selector").val());
 });
 
-let progressBar = document.querySelector('.progress-bar');
+let progressBar = document.querySelector('#progress-bar-1');
 let model;
 async function loadModel(name) {
     console.log(name)
@@ -36,6 +36,7 @@ async function loadModel(name) {
 
 let tensor, tensor1;
 $('#predict-button').click(async function () {
+    progressBar.classList.remove("hide");
     let image = $('#selected-image').get(0);
 
     tensor = tf.browser.fromPixels(image);
@@ -47,6 +48,7 @@ $('#predict-button').click(async function () {
 
     //testVis(tensor1);
     showPredictions(predictions);
+    progressBar.classList.add("hide");
 
     //ENABLE BUTTONS
     //tensor.dispose();
@@ -115,21 +117,33 @@ function showPredictions(predictions) {
     }
 }
 
+//const progressBar2 = document.querySelector('#progress-bar-2');
+//const progressBar3 = document.querySelector('#progress-bar-3');
+let infer1, infer2;
+
 // Generate Internal Activations
-function getActivations() {
-    console.log('ACTIVATIONS')
+async function getActivations() {
+    console.log('Loading activations..')
     const activationsDiv = document.querySelector('#activations');
+    //progressBar2.classList.remove("hide");
     activationsDiv.innerHTML = '';
-    if (model && tensor)
-        internalActivations(model, tensor, activationsDiv);
+    if (model && tensor) {
+        infer1 = await internalActivations(model, tensor, activationsDiv);
+        progressBar2.classList.add("hide");
+    }
+
 }
 
 // Generate Activation map on input image
-function getActivationMaps() {
+async function getActivationMaps() {
+    console.log('Loading heatmap..');
+    //progressBar3.classList.remove("hide");
     const camDiv = document.querySelector('#cam');
     camDiv.innerHTML = '';
-    if (model && tensor)
-        ClassActivationMaps(model, tensor, camDiv);
+    if (model && tensor) {
+        infer2 = await ClassActivationMaps(model, tensor, camDiv);
+        progressBar3.classList.add("hide");
+    }
 }
 
 
