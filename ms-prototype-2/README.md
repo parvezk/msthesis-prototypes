@@ -5,7 +5,6 @@
 <!-- visual classifier that explains the reasons for a classification decision to an end user -->
 
 The tool jointly predicts a class label, and shows why the predicted label is appropriate for a given image using visual evidence. 
-# [//] another comment option
 - **Visualizing intermediate outputs**: Interpret how successive layers transform the input image.
 - **Visualizing filters**: See what visual pattern or concept each filter in a network is receptive.
 - **Visualizing heatmaps**: Recognize which part of an input image attributed most to the classification decision by localizing the object in the image.
