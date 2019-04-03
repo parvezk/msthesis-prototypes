@@ -2,6 +2,12 @@
 
 MS Thesis Prototype 1
 
+> Visualizing training to recognize handwritten digits from the MNIST database
+- Training parameters
+- Training progress
+- Inference examples
+
+
 ## Building and running on localhost
 
 First install dependencies:
