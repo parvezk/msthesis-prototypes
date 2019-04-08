@@ -1,6 +1,6 @@
  # Thesis Prototype: 
 
-## Visualize What Deep Network Learns
+## Visualize what deep network learns
 > A visual exploration tool for a visual classifier that explains reasons for a classification decision to an end user.
 <!-- visual classifier that explains the reasons for a classification decision to an end user -->
 

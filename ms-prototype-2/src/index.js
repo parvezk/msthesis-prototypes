@@ -106,12 +106,12 @@ function showPredictions(predictions) {
     var el = document.querySelector('#prediction-list');
 
     var children = el.children,
-        number_of_children = children.length;
+        len = children.length;
 
-    for (var i = 0; i < number_of_children; i++) {
+    for (var i = 0; i < len; i++) {
         const text = children[i].children[1].children;
         const prob = top5[i].probability.toFixed(6);
-        
+        children[i].children[0].setAttribute('style', 'width: ' + (Math.round(prob*100)).toString() + '%');
         text[0].innerHTML = top5[i].className.split(',')[0]
         text[1].innerHTML = Math.floor(prob * 100) / 100;
     }

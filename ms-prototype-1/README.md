@@ -6,7 +6,8 @@ MS Thesis Prototype 1
 - Training parameters
 - Training progress
 - Inference examples
-
+<!--Demonstrates the internal workngs of a Convolutional Neural Network (Convnet).
+A is a light-weight convolutonal network for image classification-->
 
 ## Building and running on localhost
 
