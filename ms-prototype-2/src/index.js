@@ -6,6 +6,7 @@ import * as tfvis from '@tensorflow/tfjs-vis';
 import {
     internalActivations, ClassActivationMaps
 } from "./main.js"
+//import * as webcam from './webcam';
 
 /** INDEX.JS **/
 
@@ -158,7 +159,31 @@ function setupListeners() {
         .addEventListener('click', getActivationMaps);
 }
 
-function run() {}
+const webcamElement = document.getElementById('webcam');
+
+async function setupWebcam() {
+    return new Promise((resolve, reject) => {
+      const navigatorAny = navigator;
+      navigator.getUserMedia = navigator.getUserMedia ||
+          navigatorAny.webkitGetUserMedia || navigatorAny.mozGetUserMedia ||
+          navigatorAny.msGetUserMedia;
+      if (navigator.getUserMedia) {
+        navigator.getUserMedia({video: true},
+          stream => {
+            webcamElement.srcObject = stream;
+            webcamElement.addEventListener('loadeddata',  () => resolve(), false);
+          },
+          error => reject());
+      } else {
+        reject();
+      }
+    });
+  }
+
+  
+async function run() {
+    await setupWebcam();
+}
 
 async function testVis() {
     // Get a surface
