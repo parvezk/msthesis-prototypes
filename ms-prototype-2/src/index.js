@@ -3,10 +3,9 @@ import "babel-polyfill";
 
 import * as tf from '@tensorflow/tfjs';
 import * as tfvis from '@tensorflow/tfjs-vis';
-import {
-    internalActivations, ClassActivationMaps
-} from "./main.js"
-//import * as webcam from './webcam';
+
+import { internalActivations, ClassActivationMaps } from "./main.js"
+import WebCam from './webcam';
 
 /** INDEX.JS **/
 
@@ -40,11 +39,9 @@ $('#predict-button').click(async function () {
     progressBar.classList.remove("hide");
     let image = $('#selected-image').get(0);
 
-    tensor = tf.browser.fromPixels(image);
-    tensor1 = tensor.resizeNearestNeighbor([100, 100]);
-    tensor = tensor.resizeNearestNeighbor([224, 224]).toFloat();
+    
     //.expandDims();
-    let processedTensor = getProcessedTensor(tensor);
+    let processedTensor = getProcessedTensor(img);
     let predictions = await model.predict(processedTensor).data();
 
     //testVis(tensor1);
@@ -56,7 +53,12 @@ $('#predict-button').click(async function () {
     //processedTensor.dispose();
 });
 
-function getProcessedTensor(tensor) {
+function getProcessedTensor(media) {
+
+    tensor = tf.browser.fromPixels(media);
+    tensor1 = tensor.resizeNearestNeighbor([100, 100]);
+    tensor = tensor.resizeNearestNeighbor([224, 224]).toFloat();
+
     // More pre-processing
     let meanImageNetRGB = {
         red: 123.68,
@@ -147,7 +149,6 @@ async function getActivationMaps() {
     }
 }
 
-
 function setupListeners() {
     document.querySelector('#show-metrics')
         .addEventListener('click', showModel);
@@ -157,32 +158,32 @@ function setupListeners() {
 
     document.querySelector('#heatmap-btn')
         .addEventListener('click', getActivationMaps);
+
+    webcamBtn.addEventListener('click', classifyVideo);
 }
 
+const webcamBtn = document.querySelector('input[id="webcam-btn"]');
 const webcamElement = document.getElementById('webcam');
 
-async function setupWebcam() {
-    return new Promise((resolve, reject) => {
-      const navigatorAny = navigator;
-      navigator.getUserMedia = navigator.getUserMedia ||
-          navigatorAny.webkitGetUserMedia || navigatorAny.mozGetUserMedia ||
-          navigatorAny.msGetUserMedia;
-      if (navigator.getUserMedia) {
-        navigator.getUserMedia({video: true},
-          stream => {
-            webcamElement.srcObject = stream;
-            webcamElement.addEventListener('loadeddata',  () => resolve(), false);
-          },
-          error => reject());
-      } else {
-        reject();
-      }
-    });
-  }
+async function classifyVideo() {
+    if (this.checked)
+    {
+        const webcam = new WebCam();
+        await webcam.setupWebcam(webcamElement);
 
+        while (true) {
+            let processedTensor = getProcessedTensor(webcamElement);
+            let predictions = await model.predict(processedTensor).data();
+            showPredictions(predictions);
+
+            await tf.nextFrame();
+        }
+        
+    }
+}
   
 async function run() {
-    await setupWebcam();
+
 }
 
 async function testVis() {
