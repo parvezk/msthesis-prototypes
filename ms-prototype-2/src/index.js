@@ -3,7 +3,7 @@ import "babel-polyfill";
 
 import * as tf from '@tensorflow/tfjs';
 import * as tfvis from '@tensorflow/tfjs-vis';
-
+import * as imageNetClasses from "./imagenet_classes";
 import { internalActivations, ClassActivationMaps } from "./main.js"
 import WebCam from './webcam';
 
@@ -34,14 +34,13 @@ async function loadModel(name) {
     progressBar.classList.add("hide");
 }
 
-let tensor, tensor1;
+
 $('#predict-button').click(async function () {
     progressBar.classList.remove("hide");
     let image = $('#selected-image').get(0);
 
-    
     //.expandDims();
-    let processedTensor = getProcessedTensor(img);
+    let processedTensor = getProcessedTensor(image);
     let predictions = await model.predict(processedTensor).data();
 
     //testVis(tensor1);
@@ -53,10 +52,9 @@ $('#predict-button').click(async function () {
     //processedTensor.dispose();
 });
 
+let tensor;
 function getProcessedTensor(media) {
-
     tensor = tf.browser.fromPixels(media);
-    tensor1 = tensor.resizeNearestNeighbor([100, 100]);
     tensor = tensor.resizeNearestNeighbor([224, 224]).toFloat();
 
     // More pre-processing
@@ -95,8 +93,11 @@ function getProcessedTensor(media) {
     return processedTensor;
 }
 
+let top5, IMAGENET_CLASSES;
+IMAGENET_CLASSES = imageNetClasses.IMAGENET_CLASSES
+
 function showPredictions(predictions) {
-    let top5 = Array.from(predictions)
+    top5 = Array.from(predictions)
         .map(function (p, i) {
             return {
                 probability: p,
@@ -122,7 +123,6 @@ function showPredictions(predictions) {
 
 const progressBar2 = document.querySelector('#progress-bar-2');
 const progressBar3 = document.querySelector('#progress-bar-3');
-let infer1, infer2;
 
 // Generate Internal Activations
 async function getActivations() {
@@ -131,10 +131,9 @@ async function getActivations() {
     progressBar2.classList.remove("hide");
     activationsDiv.innerHTML = '';
     if (model && tensor) {
-        infer1 = await internalActivations(model, tensor, activationsDiv);
-        progressBar2.classList.add("hide");
+        //await internalActivations(model, tensor, activationsDiv);
+        //progressBar2.classList.add("hide");
     }
-
 }
 
 // Generate Activation map on input image
@@ -142,10 +141,13 @@ async function getActivationMaps() {
     console.log('Loading heatmap..');
     //progressBar3.classList.remove("hide");
     const camDiv = document.querySelector('#cam');
+    
+    const tensorData = mediaTensor || tensor;
     camDiv.innerHTML = '';
-    if (model && tensor) {
-        infer2 = await ClassActivationMaps(model, tensor, camDiv);
-        progressBar3.classList.add("hide");
+    if (model && tensorData) {
+        console.log(tensorData.shape);
+        //await ClassActivationMaps(model, data, top5, camDiv);
+        //progressBar3.classList.add("hide");
     }
 }
 
@@ -163,9 +165,20 @@ function setupListeners() {
 }
 
 const webcamBtn = document.querySelector('input[id="webcam-btn"]');
-const webcamElement = document.getElementById('webcam');
+const webcamElement = document.getElementById('player');
 
+const canvas = document.getElementById('canvas');
+const context = canvas.getContext('2d');
+const captureButton = document.getElementById('capture');
+
+captureButton.addEventListener('click', () => {
+    // Draw the video frame to the canvas.
+    context.drawImage(player, 0, 0, canvas.width, canvas.height);
+  });
+
+let mediaTensor;
 async function classifyVideo() {
+    webcamElement.classList.remove('hide');
     if (this.checked)
     {
         const webcam = new WebCam();
@@ -175,10 +188,11 @@ async function classifyVideo() {
             let processedTensor = getProcessedTensor(webcamElement);
             let predictions = await model.predict(processedTensor).data();
             showPredictions(predictions);
-
+            getActivationMaps()
             await tf.nextFrame();
         }
-        
+    } else {
+        webcamElement.classList.remove('hide');
     }
 }
   

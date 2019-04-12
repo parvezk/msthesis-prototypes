@@ -30,7 +30,6 @@ import * as utils from "./utils";
  *   shape `[1, height, width, 3]`.
  */
 export function gradClassActivationMap(model, classIndex, x, overlayFactor = 2.0) {
-  console.log('INSIDE', x.shape);
   // Try to locate the last conv layer of the model.
   let layerIndex = model.layers.length - 1;
   while (layerIndex >= 0) {
@@ -68,7 +67,8 @@ export function gradClassActivationMap(model, classIndex, x, overlayFactor = 2.0
     // This function runs sub-model 2 and extracts the slice of the probability
     // output that corresponds to the desired class.
     const convOutput2ClassOutput = (input) =>
-        subModel2.apply(input, {training: true}).gather([classIndex], 1);
+        //subModel2.apply(input, {training: true}).gather([classIndex], 1);
+        input.gather([classIndex], 1);
     // This is the gradient function of the output corresponding to the desired
     // class with respect to its input (i.e., the output of the last
     // convolutional layer of the original model).

@@ -53,7 +53,6 @@ export async function readImageTensorFromFile(filePath, height, width) {
  */
 
 export async function writeImageTensorToFile(imageTensor, filePath, container) {
-  //console.log(filePath)
     const imageH = imageTensor.shape[1];
     const imageW = imageTensor.shape[2];
     const imageData = imageTensor.dataSync();
