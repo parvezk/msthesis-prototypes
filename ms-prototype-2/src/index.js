@@ -32,6 +32,7 @@ async function loadModel(name) {
     model = undefined;
     model = await tf.loadLayersModel(`./tfjs-models/${name}/model.json`);
     progressBar.classList.add("hide");
+    model.summary();
 }
 
 $('#predict-button').click(async function () {
