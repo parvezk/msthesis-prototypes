@@ -1,34 +1,15 @@
 /*
- * This script contains a function that performs the following operations:
- *
- * Get visual interpretation of which parts of the image more most
- *    responsible for a convnet's classification decision, using the
- *    gradient-based class activation map (CAM) method.
- *    See function `gradClassActivationMap()`.
- */
-
-import * as tf from "@tensorflow/tfjs";
-import * as utils from "./utils";
-
-/**
- * Calculate class activation map (CAM) and overlay it on input image.
+ * Calculate class activation map (CAM) and overlay it on input image. 
  *
  * This function automatically finds the last convolutional layer, get its
  * output (activation) under the input image, weights its filters by the
  * gradient of the class output with respect to them, and then collapses along
  * the filter dimension.
- *
- * @param {tf.Sequential} model A TensorFlow.js sequential model, assumed to
- *   contain at least one convolutional layer.
- * @param {number} classIndex Index to class in the model's final classification
- *   output.
- * @param {tf.Tensor4d} x Input image, assumed to have shape
- *   `[1, height, width, 3]`.
- * @param {number} overlayFactor Optional overlay factor.
- * @returns The input image with a heat-map representation of the class
- *   activation map overlaid on top of it, as float32-type `tf.Tensor4d` of
- *   shape `[1, height, width, 3]`.
  */
+
+import * as tf from "@tensorflow/tfjs";
+import * as utils from "./utils";
+
 export function gradClassActivationMap(model, classIndex, x, overlayFactor = 2.0) {
   // Try to locate the last conv layer of the model.
   let layerIndex = model.layers.length - 1;
@@ -67,8 +48,8 @@ export function gradClassActivationMap(model, classIndex, x, overlayFactor = 2.0
     // This function runs sub-model 2 and extracts the slice of the probability
     // output that corresponds to the desired class.
     const convOutput2ClassOutput = (input) =>
-        //subModel2.apply(input, {training: true}).gather([classIndex], 1);
-        input.gather([classIndex], 1);
+        subModel2.apply(input, {training: true}).gather([classIndex], 1);
+        //input.gather([classIndex], 1);
     // This is the gradient function of the output corresponding to the desired
     // class with respect to its input (i.e., the output of the last
     // convolutional layer of the original model).

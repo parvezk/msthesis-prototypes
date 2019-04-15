@@ -34,7 +34,6 @@ async function loadModel(name) {
     progressBar.classList.add("hide");
 }
 
-
 $('#predict-button').click(async function () {
     progressBar.classList.remove("hide");
     let image = $('#selected-image').get(0);
@@ -121,9 +120,6 @@ function showPredictions(predictions) {
     }
 }
 
-const progressBar2 = document.querySelector('#progress-bar-2');
-const progressBar3 = document.querySelector('#progress-bar-3');
-
 // Generate Internal Activations
 async function getActivations() {
     console.log('Loading activations..')
@@ -139,15 +135,15 @@ async function getActivations() {
 // Generate Activation map on input image
 async function getActivationMaps() {
     console.log('Loading heatmap..');
-    //progressBar3.classList.remove("hide");
+    
     const camDiv = document.querySelector('#cam');
     
     const tensorData = mediaTensor || tensor;
+    console.log(tensorData.shape);
     camDiv.innerHTML = '';
     if (model && tensorData) {
-        console.log(tensorData.shape);
-        //await ClassActivationMaps(model, data, top5, camDiv);
-        //progressBar3.classList.add("hide");
+        await ClassActivationMaps(model, tensorData, top5, camDiv);
+        loaderBox.classList.add("hide");
     }
 }
 
@@ -159,40 +155,54 @@ function setupListeners() {
         .addEventListener('click', getActivations);
 
     document.querySelector('#heatmap-btn')
-        .addEventListener('click', getActivationMaps);
+        .addEventListener('click', async function(){
+            loaderBox.classList.remove("hide");
+            setTimeout(() => {
+                getActivationMaps();
+            }, 500)
+        });
 
-    webcamBtn.addEventListener('click', classifyVideo);
+    webcamBtn.addEventListener('click', videoOption);
 }
 
+const imageBloc = document.querySelector('#selected-image');
+const videoBloc = document.querySelector('.video-option');
 const webcamBtn = document.querySelector('input[id="webcam-btn"]');
-const webcamElement = document.getElementById('player');
+const webcamElement = document.getElementById('video');
 
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 const captureButton = document.getElementById('capture');
 
+const progressBar2 = document.querySelector('#progress-bar-2');
+const loaderBox = document.querySelector('.loader-box');
+
+
 captureButton.addEventListener('click', () => {
     // Draw the video frame to the canvas.
-    context.drawImage(player, 0, 0, canvas.width, canvas.height);
+    context.drawImage(webcamElement, 0, 0, canvas.width, canvas.height);
   });
 
+
 let mediaTensor;
-async function classifyVideo() {
-    webcamElement.classList.remove('hide');
+async function videoOption() {
+    imageBloc.classList.add('hide');
+    videoBloc.classList.remove('hide');
+
     if (this.checked)
     {
         const webcam = new WebCam();
         await webcam.setupWebcam(webcamElement);
 
         while (true) {
-            let processedTensor = getProcessedTensor(webcamElement);
-            let predictions = await model.predict(processedTensor).data();
+            let mediaTensor = getProcessedTensor(webcamElement);
+            let predictions = await model.predict(mediaTensor).data();
             showPredictions(predictions);
-            getActivationMaps()
             await tf.nextFrame();
         }
     } else {
-        webcamElement.classList.remove('hide');
+        videoBloc.classList.add('hide');
+        imageBloc.classList.remove('hide');
     }
 }
   
@@ -218,13 +228,11 @@ async function testVis() {
 }
 
 async function showModel() {
-
     const visorInstance = tfvis.visor();
     //console.log(visorInstance)
     if (!visorInstance.isOpen()) {
         visorInstance.toggle();
     }
-
     const surface = {
         name: 'Model Summary',
         tab: 'Model'
