@@ -7,7 +7,7 @@
  * the filter dimension.
  */
 
-import * as tf from "@tensorflow/tfjs";
+import * as tf from "@tensorflow/tfjs-node";
 import * as utils from "./utils";
 
 export function gradClassActivationMap(model, classIndex, x, overlayFactor = 2.0) {

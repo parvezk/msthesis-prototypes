@@ -1,7 +1,7 @@
 import "./styles.scss";
 import "babel-polyfill";
 
-import * as tf from '@tensorflow/tfjs';
+import * as tf from '@tensorflow/tfjs-node';
 import * as tfvis from '@tensorflow/tfjs-vis';
 import * as imageNetClasses from "./imagenet_classes";
 import { internalActivations, ClassActivationMaps } from "./main.js"
@@ -32,13 +32,12 @@ async function loadModel(name) {
     model = undefined;
     model = await tf.loadLayersModel(`./tfjs-models/${name}/model.json`);
     progressBar.classList.add("hide");
-    model.summary();
 }
+
 
 $('#predict-button').click(async function () {
     progressBar.classList.remove("hide");
     let image = $('#selected-image').get(0);
-
     //.expandDims();
     let processedTensor = getProcessedTensor(image);
     let predictions = await model.predict(processedTensor).data();
@@ -49,7 +48,7 @@ $('#predict-button').click(async function () {
 
     //ENABLE BUTTONS
     //tensor.dispose();
-    //processedTensor.dispose();
+    processedTensor.dispose();
 });
 
 let tensor;
@@ -146,6 +145,9 @@ async function getActivationMaps() {
         await ClassActivationMaps(model, tensorData, top5, camDiv);
         loaderBox.classList.add("hide");
     }
+    if (mediaTensor) mediaTensor.dispose();
+    tensor.dispose();
+    tensorData.dispose();
 }
 
 function setupListeners() {

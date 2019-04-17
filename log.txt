@@ -1,0 +1,44 @@
+pixels must be HTMLCanvasElement' error
+
+https://github.com/tensorflow/tfjs/issues/594
+https://github.com/tensorflow/tfjs/issues/1414
+https://github.com/tensorflow/tfjs/issues/462
+
+HTML Image HTMLCanvasElement
+https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement
+
+Implement Gradient Descent
+https://towardsdatascience.com/implement-gradient-descent-in-python-9b93ed7108d1
+
+HTML5-JavaScript based video player 
+https://www.tutorialspoint.com/How-to-take-a-snapshot-of-HTML5-JavaScript-based-video-player
+Use video with canvas: http://www.peachpit.com/articles/article.aspx?p=1804854&seqNum=4
+https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Manipulating_video_using_canvas
+https://developer.mozilla.org/en-US/docs/Web/API/MediaStream
+
+Get video frame as Image
+http://cwestblog.com/2017/05/03/javascript-snippet-get-video-frame-as-an-image/
+https://developers.google.com/web/fundamentals/media/capturing-images/
+http://appcropolis.com/blog/web-technology/using-html5-canvas-to-capture-frames-from-a-video/ 
+
+
+Math tools
+https://www.desmos.com/calculator
+https://www.symbolab.com/solver/functions-graphing-calculator/?or=dym&query=derivative%20of%20y%3D(x%2B5)%5E%7B2%7D 
+https://www.mathwarehouse.com/calculus/derivatives/how-to-use-the-power-rule.php
+
+NYU HPC
+https://wikis.nyu.edu/display/NYUHPC/Running+Jupyter+on+Prince
+https://wikis.nyu.edu/display/NYUHPC/Logging+in+to+the+NYU+HPC+Clusters 
+https://wikis.nyu.edu/display/NYUHPC/Software+and+Environment+Modules
+https://anaconda.org/conda-forge/keras
+https://www.ruby-lang.org/en/documentation/installation/ 
+
+Packages
+"browserify-fs": "^1.0.0",
+"fs-es6": "0.0.2",
+
+"browserfs": "^1.4.3",
+"child_process": "^1.0.2",
+"fs": "0.0.1-security",
+"shelljs": "~0.8.3",
