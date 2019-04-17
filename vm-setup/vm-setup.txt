@@ -1,0 +1,38 @@
+
+HPC Shenglong Wang
+Attachments
+Tue, Apr 16, 5:04 PM (1 day ago)
+to me, HPC
+
+Please try to use Python virtual environment to install and manage Python packages, please check the attached instructions. If you need help, please let us know.
+
+Here are the steps to setup PyTorch CPU version, 
+
+ 1040  mkdir pytorch-cpu
+ 1041  cd pytorch-cpu/
+ 1043  module load  python3/intel/3.6.3
+ 1044  virtualenv --system-site-packages py3.6.3
+ 1045  source py3.6.3/bin/activate
+ 1046 pip3 install https://download.pytorch.org/whl/cpu/torch-1.0.1.post2-cp36-cp36m-linux_x86_64.whl
+ 1047 pip3 install -I torchvision
+ 1048 pip3 install -I jupyter
+
+then inside the SBATCH script, 
+
+module purge
+module load python3/intel/3.6.3
+source ~/pytorch-cpu/py3.6.3/bin/activate
+
+If you need GPU version of PyTorch, please check 
+
+https://pytorch.org
+
+pip3 install torch torchvision
+
+Latest version of TensorFlow has to work with module cudnn/10.0v7.4.2.24
+
+Best,
+Shenglong
+
+
+
