@@ -9,49 +9,19 @@ import WebCam from './webcam';
 
 /** INDEX.JS **/
 
-$("#image-selector").change(function () {
-    let reader = new FileReader();
-    reader.onload = function () {
-        let dataURL = reader.result;
-        $("#selected-image").attr("src", dataURL);
-    }
-    let file = $("#image-selector").prop("files")[0];
-    reader.readAsDataURL(file);
-});
 
-const modelSelect = document.querySelector('#model-selector');
-$("#model-selector").change(function () {
-    loadModel($("#model-selector").val());
-});
-
-let progressBar = document.querySelector('#progress-bar-1');
-let model;
-async function loadModel(name) {
-    console.log(name)
-    progressBar.classList.remove("hide");
-    model = undefined;
-    model = await tf.loadLayersModel(`./tfjs-models/${name}/model.json`);
-    progressBar.classList.add("hide");
-}
+const imageElem = document.querySelector('#image-container');
+const videoElem = document.querySelector('.video-option');
+const webcamBtn = document.querySelector('input[id="webcam-btn"]');
+const webcamElement = document.getElementById('video');
 
 
-$('#predict-button').click(async function () {
-    progressBar.classList.remove("hide");
-    let image = $('#selected-image').get(0);
-    //.expandDims();
-    let processedTensor = getProcessedTensor(image);
-    let predictions = await model.predict(processedTensor).data();
+const progressBar1 = document.querySelector('#progress-bar-1');
+const progressBar2 = document.querySelector('#progress-bar-2');
+const loaderBox = document.querySelector('.loader-box');
 
-    //testVis(tensor1);
-    showPredictions(predictions);
-    progressBar.classList.add("hide");
+let model, tensor, mediaTensor;
 
-    //ENABLE BUTTONS
-    //tensor.dispose();
-    processedTensor.dispose();
-});
-
-let tensor;
 function getProcessedTensor(media) {
     tensor = tf.browser.fromPixels(media);
     tensor = tensor.resizeNearestNeighbor([224, 224]).toFloat();
@@ -150,6 +120,7 @@ async function getActivationMaps() {
     tensorData.dispose();
 }
 
+// EVENT HANDLERS
 function setupListeners() {
     document.querySelector('#show-metrics')
         .addEventListener('click', showModel);
@@ -168,29 +139,55 @@ function setupListeners() {
     webcamBtn.addEventListener('click', videoOption);
 }
 
-const imageBloc = document.querySelector('#selected-image');
-const videoBloc = document.querySelector('.video-option');
-const webcamBtn = document.querySelector('input[id="webcam-btn"]');
-const webcamElement = document.getElementById('video');
+async function run() {
 
-const canvas = document.getElementById('canvas');
-const context = canvas.getContext('2d');
-const captureButton = document.getElementById('capture');
+}
 
-const progressBar2 = document.querySelector('#progress-bar-2');
-const loaderBox = document.querySelector('.loader-box');
+document.querySelector('#image-selector')
+.addEventListener('change', (e) => {
 
-
-captureButton.addEventListener('click', () => {
-    // Draw the video frame to the canvas.
-    context.drawImage(webcamElement, 0, 0, canvas.width, canvas.height);
-  });
+    let reader = new FileReader();
+    reader.onload = function () {
+        let dataURL = reader.result;
+        imageElem.setAttribute("src", dataURL);
+    }
+    let file = $("#image-selector").prop("files")[0];
+    reader.readAsDataURL(file);
+});
 
 
-let mediaTensor;
+document.querySelector('#model-selector')
+.addEventListener('change', () => {
+    loadModel($("#model-selector").val());
+});
+
+async function loadModel(name) {
+    console.log(name)
+    progressBar1.classList.remove("hide");
+    model = undefined;
+    model = await tf.loadLayersModel(`./tfjs-models/${name}/model.json`);
+    progressBar1.classList.add("hide");
+}
+
+$('#predict-button').click(async function () {
+    progressBar1.classList.remove("hide");
+    let image = $('#selected-image').get(0);
+    //.expandDims();
+    let processedTensor = getProcessedTensor(image);
+    let predictions = await model.predict(processedTensor).data();
+
+    //testVis(tensor1);
+    showPredictions(predictions);
+    progressBar1.classList.add("hide");
+
+    //ENABLE BUTTONS
+    //tensor.dispose();
+    processedTensor.dispose();
+});
+
 async function videoOption() {
-    imageBloc.classList.add('hide');
-    videoBloc.classList.remove('hide');
+    imageElem.classList.add('hide');
+    videoElem.classList.remove('hide');
 
     if (this.checked)
     {
@@ -204,14 +201,19 @@ async function videoOption() {
             await tf.nextFrame();
         }
     } else {
-        videoBloc.classList.add('hide');
-        imageBloc.classList.remove('hide');
+        videoElem.classList.add('hide');
+        imageElem.classList.remove('hide');
     }
 }
-  
-async function run() {
 
-}
+document.getElementById('capture')
+.addEventListener('click', () => {
+    const canvas = document.getElementById('webcam-frame');
+    const context = canvas.getContext('2d');
+    // Draw the video frame to the canvas.
+    context.drawImage(webcamElement, 0, 0, canvas.width, canvas.height);
+  });
+
 
 async function testVis() {
     // Get a surface
@@ -243,11 +245,4 @@ async function showModel() {
     tfvis.show.modelSummary(surface, model);
 }
 
-// EVENT HANDLERS
-document
-    .addEventListener('DOMContentLoaded', () => {
-        setupListeners();
-        run();
-    });
 
-modelSelect.addEventListener('change', run);

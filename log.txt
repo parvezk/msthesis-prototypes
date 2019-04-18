@@ -27,13 +27,6 @@ https://www.desmos.com/calculator
 https://www.symbolab.com/solver/functions-graphing-calculator/?or=dym&query=derivative%20of%20y%3D(x%2B5)%5E%7B2%7D 
 https://www.mathwarehouse.com/calculus/derivatives/how-to-use-the-power-rule.php
 
-NYU HPC
-https://wikis.nyu.edu/display/NYUHPC/Running+Jupyter+on+Prince
-https://wikis.nyu.edu/display/NYUHPC/Logging+in+to+the+NYU+HPC+Clusters 
-https://wikis.nyu.edu/display/NYUHPC/Software+and+Environment+Modules
-https://anaconda.org/conda-forge/keras
-https://www.ruby-lang.org/en/documentation/installation/ 
-
 Packages
 "browserify-fs": "^1.0.0",
 "fs-es6": "0.0.2",

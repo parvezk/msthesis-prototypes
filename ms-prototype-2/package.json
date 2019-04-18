@@ -15,7 +15,7 @@
   "dependencies": {
     "@tensorflow/tfjs": "latest",
     "@tensorflow/tfjs-node": "latest",
-    "@tensorflow/tfjs-node-gpu": "^latest",
+    "@tensorflow/tfjs-node-gpu": "latest",
     "@tensorflow/tfjs-vis": "^0.5.1",
     "babel-preset-latest": "^6.24.1",
     "path": "^0.12.7"

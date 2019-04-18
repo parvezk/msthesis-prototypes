@@ -35,4 +35,9 @@ Best,
 Shenglong
 
 
-
+NYU HPC
+https://wikis.nyu.edu/display/NYUHPC/Running+Jupyter+on+Prince
+https://wikis.nyu.edu/display/NYUHPC/Logging+in+to+the+NYU+HPC+Clusters 
+https://wikis.nyu.edu/display/NYUHPC/Software+and+Environment+Modules
+https://anaconda.org/conda-forge/keras
+https://www.ruby-lang.org/en/documentation/installation/ 
