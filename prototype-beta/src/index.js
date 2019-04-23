@@ -3,7 +3,7 @@
 import "./styles.scss";
 import "babel-polyfill";
 
-import * as tf from '@tensorflow/tfjs-node';
+import * as tf from '@tensorflow/tfjs';
 import * as tfvis from '@tensorflow/tfjs-vis';
 import * as imageNetClasses from "./imagenet_classes";
 
@@ -131,7 +131,7 @@ function setupListeners() {
         let predictions = await model.predict(processedTensor).data();
         showPredictions(predictions);
         progressBar1.classList.add("hide");
-    
+        attributionsSetup(processedTensor);
         processedTensor.dispose();
     });
 
@@ -245,6 +245,45 @@ async function testVis() {
     drawArea.appendChild(canvas);
 }
 
+async function attributionsSetup(img_tensor) {
+
+    const layerNames = []
+    model.layers.map(layerName => {
+      if (layerName.name.startsWith('block', 0))
+        layerNames.push(layerName.name);
+    });
+
+  const layerOutputs =layerNames.map(layerName => model.getLayer(layerName).output);
+  const activation_model = tf.model({inputs: model.input, outputs: layerOutputs});
+  const activations = await activation_model.predict(img_tensor);
+  //let predictions = await model.predict(processedTensor).data();
+
+  let matrix = [];
+  for (let i = 0; i < activations.length - 1; ++i) {
+    const layerName = layerNames[i];
+    let activationTensors = tf.split(activations[i], activations[i].shape[activations[i].shape.length - 1], -1);
+    let activationTensorClone = activationTensors;
+    //console.log(layerName, activationTensors);
+    
+    const layerWise = [];
+    for (let j = 0; j < activationTensors.length - 1; ++j) {
+        layerWise.push(activationTensors[j].max());
+    }
+    matrix.push(layerWise);
+    //console.log(vizArray)
+    //vizArray.push(maxValue.dataSync()[0]);
+    //const surface = { name: layerName, tab: 'Channels' };
+    //tfvis.render.histogram(vizArray, surface);
+
+    console.log(matrix)
+
+    for (let k = 0; k < activationTensors.length - 1; ++k) {
+        
+    }
+ 
+  }
+}
+
 /* INSIDE PREDICT
 
 
@@ -259,7 +298,6 @@ async function testVis() {
   });
 
   const layerOutputs =layerNames.map(layerName => model.getLayer(layerName).output);
-
   const activation_model = tf.model({inputs: model.input, outputs: layerOutputs});
   const activations = activation_model.predict(img_tensor);
   

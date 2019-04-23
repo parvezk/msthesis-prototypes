@@ -2,9 +2,6 @@
  * Tensorflow.js Examples Utility functions for the visualize-convnet
  */
 
-//import * as fs from "fs";
-//var jimp = require('jimp');
-
 import * as jimp from 'jimp';
 import * as tf from '@tensorflow/tfjs';
 
@@ -131,9 +128,6 @@ const RGB_COLORMAP = [
 /**
  * Convert an input monocolor image to color by applying a color map.
  * 
- * @param {tf.Tensor4d} x Input monocolor image, assumed to be of shape
- *   `[1, height, width, 1]`.
- * @returns Color image, of shape `[1, height, width, 3]`.
  */
 export function applyColorMap(x) {
   tf.util.assert(

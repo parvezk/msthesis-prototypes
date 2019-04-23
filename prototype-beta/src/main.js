@@ -48,17 +48,13 @@ export async function internalActivations(model, inputTensor, activationsDiv) {
 
     // Calculate Grad-CAM heatmap.
     var t0 = performance.now();
-    console.log('fire gradClassActivationMap')
     const xWithCAMOverlay = cam.gradClassActivationMap(model, indices[0], x);
     var t1 = performance.now();
-    console.log("gradClassActivationMap: " + (t1 - t0) / 1000 + " sec.");
+    //console.log("gradClassActivationMap: " + (t1 - t0) / 1000 + " sec.");
     const camImagePath = 'dist/cam/cam.png';
 
     var t2 = performance.now();
-    console.log('fire writeImageTensorToFile')
     await utils.writeImageTensorToFile(xWithCAMOverlay, camImagePath, container);
     var t3 = performance.now();
-    
-    console.log("writeImageTensorToFile: " + (t3 - t2) / 1000 + " sec.");
-    console.log(`Written CAM-overlaid image to: ${camImagePath}`);
+    //console.log("writeImageTensorToFile: " + (t3 - t2) / 1000 + " sec.");
  }

@@ -1,0 +1,4 @@
++ rollup@1.10.1
+updated 1 package and audited 14129 packages in 5.297s
+found 1 high severity vulnerability
+  run `npm audit fix` to fix them, or `npm audit` for details

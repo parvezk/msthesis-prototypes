@@ -7,7 +7,7 @@
  * the filter dimension.
  */
 
-import * as tf from "@tensorflow/tfjs-node";
+import * as tf from "@tensorflow/tfjs";
 import * as utils from "./utils";
 
 export function gradClassActivationMap(model, classIndex, x, overlayFactor = 2.0) {
@@ -84,6 +84,11 @@ export function gradClassActivationMap(model, classIndex, x, overlayFactor = 2.0
 
     // To form the final output, overlay the color heat map on the input image.
     heatMap = heatMap.mul(overlayFactor).add(x.div(255));
-    return heatMap.div(heatMap.max()).mul(255);
+    heatMap = heatMap.div(heatMap.max()).mul(255);
+    console.log(heatMap.shape, heatMap.rank);
+    let dataArr = heatMap.arraySync()[0];
+    console.log(dataArr.length)
+    console.log(dataArr[0])
+    return heatMap;
   });
 }
