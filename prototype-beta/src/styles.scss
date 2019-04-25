@@ -40,6 +40,7 @@ header {
     }
 
     p {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
       padding: 0;
       font-size: 18px;
@@ -267,6 +268,13 @@ main {
     width: 40%;
     float: left;
     text-align: right;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 1.15em;
+    letter-spacing: 1px;
+
+    &::first-letter {
+      text-transform: uppercase;
+    }
   }
 
   div:last-child {
