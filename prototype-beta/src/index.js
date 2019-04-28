@@ -5,12 +5,16 @@ import "babel-polyfill";
 
 import * as tf from '@tensorflow/tfjs';
 import * as tfvis from '@tensorflow/tfjs-vis';
-import * as imageNetClasses from "./imagenet_classes";
+import * as d3 from "d3";
 
-import { internalActivations, ClassActivationMaps } from "./main.js"
 import WebCam from './webcam';
 import { deprocessImage } from "./filters";
 import * as utils from "./utils";
+import { AttributionGraph } from "./attribution-graph"
+
+import * as imageNetClasses from "./imagenet_classes";
+import {layerChannelCounts} from './layers';
+import { internalActivations, ClassActivationMaps } from "./main.js"
 
 const imageElem = document.querySelector('#image-container');
 const videoElem = document.querySelector('.video-option');
@@ -116,40 +120,40 @@ async function getActivationMaps() {
         loaderBox.classList.add("hide");
     }
     if (mediaTensor) mediaTensor.dispose();
-    tensor.dispose();
-    tensorData.dispose();
+    if (tensor) tensor.dispose();
+    if (tensorData) tensorData.dispose();
 }
 
 // EVENT HANDLERS
 function setupListeners() {
 
+    document.querySelector("#model-selector")
+        .addEventListener("change", () => {
+            loadModel($("#model-selector").val());
+    });
+
+    document
+    .querySelector("#image-selector")
+    .addEventListener("change", loadImage);
+
     $('#predict-button').click(async function () {
         progressBar1.classList.remove("hide");
         let image = $('#image-container').get(0);
         //.expandDims();
-        let processedTensor = getProcessedTensor(image);
+        let processedTensor = await getProcessedTensor(image);
         let predictions = await model.predict(processedTensor).data();
         showPredictions(predictions);
         progressBar1.classList.add("hide");
-        attributionsSetup(processedTensor);
+
         processedTensor.dispose();
     });
-
-    document
-        .querySelector("#image-selector")
-        .addEventListener("change", loadImage);
-
-    document.querySelector("#model-selector")
-        .addEventListener("change", () => {
-            loadModel($("#model-selector").val());
-        });
 
     document.querySelector("#show-metrics")
         .addEventListener("click", showModel);
 
-    document
-        .querySelector("#activation-btn")
-        .addEventListener("click", getActivations);
+    //document
+      //  .querySelector("#activation-btn")
+        //.addEventListener("click", getActivations);
 
     document
         .querySelector("#heatmap-btn")
@@ -158,7 +162,20 @@ function setupListeners() {
             setTimeout(() => {
                 getActivationMaps();
             }, 500);
-        });
+    });
+
+    $('#activ-btn').click(async () => {
+        let image = $('#image-container').get(0);
+        ActivationGraph(image);
+    })
+
+    $('#graph-btn').click(async () => {
+        let image = $('#image-container').get(0);
+        AttributionGraph();
+        setTimeout(() => {
+            FeatureMaps(image);
+        }, 500)
+    })
 
     webcamBtn.addEventListener("click", videoOption);
 
@@ -245,101 +262,162 @@ async function testVis() {
     drawArea.appendChild(canvas);
 }
 
-async function attributionsSetup(img_tensor) {
+async function AttributionMatrix(img_tensor) {
 
     const layerNames = []
     model.layers.map(layerName => {
-      if (layerName.name.startsWith('block', 0))
-        layerNames.push(layerName.name);
+        if (layerName.name.startsWith('block', 0))
+            layerNames.push(layerName.name);
     });
 
-  const layerOutputs =layerNames.map(layerName => model.getLayer(layerName).output);
-  const activation_model = tf.model({inputs: model.input, outputs: layerOutputs});
-  const activations = await activation_model.predict(img_tensor);
-  //let predictions = await model.predict(processedTensor).data();
+    const layerOutputs = layerNames.map(layerName => model.getLayer(layerName).output);
+    const activation_model = tf.model({ inputs: model.input, outputs: layerOutputs });
+    const activations = await activation_model.predict(img_tensor);
 
-  let matrix = [];
-  for (let i = 0; i < activations.length - 1; ++i) {
-    const layerName = layerNames[i];
-    let activationTensors = tf.split(activations[i], activations[i].shape[activations[i].shape.length - 1], -1);
-    let activationTensorClone = activationTensors;
-    //console.log(layerName, activationTensors);
-    
-    const layerWise = [];
-    for (let j = 0; j < activationTensors.length - 1; ++j) {
-        layerWise.push(activationTensors[j].max());
+    let matrix = [];
+    for (let i = 0; i < activations.length - 1; ++i) {
+        const layerName = layerNames[i];
+        let activationTensors = tf.split(activations[i], activations[i].shape[activations[i].shape.length - 1], -1);
+
+        const layerWise = [];
+        for (let j = 0; j < activationTensors.length - 1; ++j) {
+            const imgs_acts_max = activationTensors[j].max([1, 2]);
+            console.log(imgs_acts_max.shape)
+            for (let k=0; k<imgs_acts_max.shape[0]; k++) {
+                const top_channels = [];
+                
+                const working_acts_max = imgs_acts_max[k] / tf.sum(imgs_acts_max[k]);
+                console.log("working_acts_max")
+            } 
+        }
     }
-    matrix.push(layerWise);
-    //console.log(vizArray)
-    //vizArray.push(maxValue.dataSync()[0]);
-    //const surface = { name: layerName, tab: 'Channels' };
-    //tfvis.render.histogram(vizArray, surface);
 
-    console.log(matrix)
-
-    for (let k = 0; k < activationTensors.length - 1; ++k) {
-        
-    }
- 
-  }
 }
 
-/* INSIDE PREDICT
+async function FeatureMaps(image) {
+    const dagSVG = d3.select('#dag');
+    const dagG = dagSVG.selectAll("#dagG");
+    
+    const img_tensor = await getProcessedTensor(image);
+    let layers = Object.keys(layerChannelCounts).reverse();
 
+    const layerOutputs = layers.map(layerName => model.getLayer(layerName).output);
+    const activation_model = tf.model({ inputs: model.input, outputs: layerOutputs });
+    const activations = activation_model.predict(img_tensor);
 
-  /*
-  // EXP
-  const img_tensor = getProcessedTensor(imageElem);
-  
-  const layerNames = []
-  model.layers.map(layerName => {
-    if (layerName.name.startsWith('block', 0))
-      layerNames.push(layerName.name);
-  });
+    for (let i = 0; i < 8; ++i) {
+        const layerName = layers[i];
 
-  const layerOutputs =layerNames.map(layerName => model.getLayer(layerName).output);
-  const activation_model = tf.model({inputs: model.input, outputs: layerOutputs});
-  const activations = activation_model.predict(img_tensor);
-  
+        const activationTensors = tf.split(activations[i], activations[i].shape[activations[i].shape.length - 1], -1);
+        dagG.selectAll('.fv-ch-' + layerName)
+        .each( async function(d, j) {
+            
+            const container = d3.select(this).node();
+            var xhtmlNS = "http://www.w3.org/1999/xhtml";
+            var context = container.getElementsByTagNameNS(xhtmlNS,'canvas')[0].getContext('2d');
+            context.fillStyle = 'rgba(0,200,0,0.7)';
+            context.fillRect(0,0,100,75);
+            
+            let imageTensor = tf.tidy(() => deprocessImage(activationTensors[j]));
+            imageTensor = utils.applyColorMap(imageTensor);
+            imageTensor = imageTensor.reshape([imageTensor.shape[1], imageTensor.shape[2], imageTensor.shape[3]]);
 
-  for (let i = 0; i < activations.length - 1; ++i) {
-    const layerName = layerNames[i];
+            const canvas = document.createElement("canvas");
+            canvas.getContext("2d");
+            canvas.width = imageTensor[0];
+            canvas.height = imageTensor[1];
+            await tf.browser.toPixels(imageTensor, canvas);
+            
+            //container.append(canvas);
+            //grab the context from your destination canvas
+            //var destCtx = destinationCanvas.getContext('2d');
+
+            //call its drawImage() function passing it the source canvas directly
+            context.drawImage(canvas, 0, 0);
+
+            imageTensor.dispose();
+            
+        })
+
+        tf.dispose(activationTensors);
+        
+    }
+}
+
+async function ActivationGraph(image) {
+
+    const img_tensor = await getProcessedTensor(image);
+    const layerNames = []
+    model.layers.map(layerName => {
+        if (layerName.name.startsWith('block', 0))
+            layerNames.push(layerName.name);
+    });
+
+    const layerOutputs = layerNames.map(layerName => model.getLayer(layerName).output);
+    const activation_model = tf.model({ inputs: model.input, outputs: layerOutputs });
+    const activations = activation_model.predict(img_tensor);
 
     const surface = tfvis.visor().surface({
-      name: "Surface",
-      tab: layerName
+        name: "Surface",
+        tab: 'layerName'
     });
     const drawArea = surface.drawArea;
+    
+    // LAYER ACTIVATION FLATTENED
+    for (let i = 0; i < activations.length - 1; ++i) {
+        const layerName = layerNames[i];
 
-    const activationTensors = tf.split(activations[i], activations[i].shape[activations[i].shape.length - 1], -1);
+        let compression = activations[i];
+        
+        compression = compression.reshape([compression.shape[1], compression.shape[2], compression.shape[3]])
+        compression = compression.mean(-1);
+        
+        
+        let imageTensor = tf.tidy(() => deprocessImage(compression));
 
-    const numFilters = 8;
-    const actualNumFilters = numFilters <= activationTensors.length ? numFilters : activationTensors.length;
+        compression = compression.reshape([1, compression.shape[0], compression.shape[1], 1]);
+        
+        imageTensor = utils.applyColorMap(compression); 
+        imageTensor = imageTensor.reshape([imageTensor.shape[1], imageTensor.shape[2], imageTensor.shape[3]]);
 
-    for (let j = 0; j < actualNumFilters; ++j) {
-      let imageTensor = tf.tidy(() => deprocessImage(activationTensors[j]));
-      imageTensor = utils.applyColorMap(imageTensor);
-      imageTensor = imageTensor.reshape([imageTensor.shape[1], imageTensor.shape[2], imageTensor.shape[3]]);
 
-      
-      //const x = imageTensor.as3D(imageTensor.shape[1], imageTensor.shape[2], imageTensor.shape[3])
-      console.log(imageTensor.shape, imageTensor.rank, imageTensor.dtype);
+        const canvas = document.createElement("canvas");
+        canvas.getContext("2d");
+        canvas.width = imageTensor[0];
+        canvas.height = imageTensor[1];
+        canvas.style = "margin: 2px;";
+        await tf.browser.toPixels(imageTensor, canvas);
+        drawArea.appendChild(canvas);
 
-    const canvas = document.createElement("canvas");
-    canvas.getContext("2d");
-    canvas.width = imageTensor[0];
-    canvas.height = imageTensor[1];
-    canvas.style = "margin: 2px;";
-    await tf.browser.toPixels(imageTensor, canvas);
-    drawArea.appendChild(canvas);
+        imageTensor.dispose();  
 
-    imageTensor.dispose();
+        /*
+        // FULL CHANNELS
+        const activationTensors = tf.split(activations[i], activations[i].shape[activations[i].shape.length - 1], -1);
+        const actualNumFilters = 8
+
+        for (let j = 0; j < actualNumFilters; ++j) {
+            
+            let imageTensor = tf.tidy(() => deprocessImage(activationTensors[j]));
+            imageTensor = utils.applyColorMap(imageTensor);
+            imageTensor = imageTensor.reshape([imageTensor.shape[1], imageTensor.shape[2], imageTensor.shape[3]]);
+
+            const canvas = document.createElement("canvas");
+            canvas.getContext("2d");
+            canvas.width = imageTensor[0];
+            canvas.height = imageTensor[1];
+            canvas.style = "margin: 2px;";
+            await tf.browser.toPixels(imageTensor, canvas);
+            drawArea.appendChild(canvas);
+
+            imageTensor.dispose();
+        }
+
+        tf.dispose(activationTensors);
+        */
+
     }
 
-    tf.dispose(activationTensors);
-
-  }
-  
-  tf.dispose(activations)
-  img_tensor.dispose();
-  */
+    tf.dispose(activations)
+    img_tensor.dispose();
+}

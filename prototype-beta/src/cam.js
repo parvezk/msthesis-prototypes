@@ -10,7 +10,7 @@
 import * as tf from "@tensorflow/tfjs";
 import * as utils from "./utils";
 
-export function gradClassActivationMap(model, classIndex, x, overlayFactor = 2.0) {
+export function ClassActivationMap(model, classIndex, x, overlayFactor = 2.0) {
   // Try to locate the last conv layer of the model.
   let layerIndex = model.layers.length - 1;
   while (layerIndex >= 0) {
@@ -21,7 +21,8 @@ export function gradClassActivationMap(model, classIndex, x, overlayFactor = 2.0
   }
   tf.util.assert(
       layerIndex >= 0, `Failed to find a convolutional layer in model`);
-
+  
+  layerIndex = 17;
   const lastConvLayer = model.layers[layerIndex];
 
   // Get "sub-model 1", which goes from the original input to the output
@@ -35,9 +36,11 @@ export function gradClassActivationMap(model, classIndex, x, overlayFactor = 2.0
   const newInput = tf.input({shape: lastConvLayerOutput.shape.slice(1)});
   layerIndex++;
   let y = newInput;
+
   while (layerIndex < model.layers.length) {
     y = model.layers[layerIndex++].apply(y);
   }
+
   const subModel2 = tf.model({inputs: newInput, outputs: y});
 
   return tf.tidy(() => {
@@ -85,10 +88,14 @@ export function gradClassActivationMap(model, classIndex, x, overlayFactor = 2.0
     // To form the final output, overlay the color heat map on the input image.
     heatMap = heatMap.mul(overlayFactor).add(x.div(255));
     heatMap = heatMap.div(heatMap.max()).mul(255);
+
+    /*
     console.log(heatMap.shape, heatMap.rank);
     let dataArr = heatMap.arraySync()[0];
     console.log(dataArr.length)
     console.log(dataArr[0])
+    */
+
     return heatMap;
   });
 }

@@ -68,8 +68,10 @@ export async function writeInternalActivationAndGetOutput(
 }
 
 /** Center and scale input image so the pixel values fall into [0, 255]. */
-function deprocessImage(x) {
+export function deprocessImage(x) {
+    
     return tf.tidy(() => {
+      const EPSILON = 1e-5;
       const {
         mean,
         variance
@@ -77,7 +79,7 @@ function deprocessImage(x) {
       x = x.sub(mean);
       // Add a small positive number (EPSILON) to the denominator to prevent
       // division-by-zero.
-      x = x.div(tf.sqrt(variance).add(tf.ENV.get('EPSILON')));
+      x = x.div(tf.sqrt(variance).add(EPSILON));
       // Clip to [0, 1].
       x = x.add(0.5);
       x = tf.clipByValue(x, 0, 1);

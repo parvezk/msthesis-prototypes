@@ -46,15 +46,14 @@ export async function internalActivations(model, inputTensor, activationsDiv) {
         container.classList.add('class-activation-map');
         camDiv.appendChild(container);
 
-    // Calculate Grad-CAM heatmap.
+    // Calculate the sensitivity
     var t0 = performance.now();
-    const xWithCAMOverlay = cam.gradClassActivationMap(model, indices[0], x);
+    const xWithCAMOverlay = cam.ClassActivationMap(model, indices[0], x);
     var t1 = performance.now();
-    //console.log("gradClassActivationMap: " + (t1 - t0) / 1000 + " sec.");
-    const camImagePath = 'dist/cam/cam.png';
+    //console.log("ClassActivationMap: " + (t1 - t0) / 1000 + " sec.");
 
     var t2 = performance.now();
-    await utils.writeImageTensorToFile(xWithCAMOverlay, camImagePath, container);
+    await utils.writeImageTensorToFile(xWithCAMOverlay, container);
     var t3 = performance.now();
     //console.log("writeImageTensorToFile: " + (t3 - t2) / 1000 + " sec.");
  }

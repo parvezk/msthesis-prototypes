@@ -49,7 +49,7 @@ export async function readImageTensorFromFile(filePath, height, width) {
  * Write an image tensor to a image file.
  */
 
-export async function writeImageTensorToFile(imageTensor, filePath, container) {
+export async function writeImageTensorToFile(imageTensor, container) {
     const imageH = imageTensor.shape[1];
     const imageW = imageTensor.shape[2];
     const imageData = imageTensor.dataSync();
@@ -76,21 +76,17 @@ export async function writeImageTensorToFile(imageTensor, filePath, container) {
               reject(err);
             } else {
               img.getBase64(Jimp.AUTO, function (err, src) {
-
                 var img = document.createElement("img");
                 img.setAttribute("src", src);
                 container.appendChild(img);
-
-                //fs.writeFile(filePath, src, function(err){ console.log(err)})
               });
-              //img.write(filePath);
               resolve();
             }
           });
     });
   }
 
-  // 64 x 3 RGB colormap.
+// 64 x 3 RGB colormap.
 // This is used to convert a 1-channel (grayscale) image into a color
 // (RGB) one. The color map is based on the output of the "parula" colormap
 // command in MATLAB.
