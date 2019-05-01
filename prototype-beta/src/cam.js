@@ -22,7 +22,7 @@ export function ClassActivationMap(model, classIndex, x, overlayFactor = 2.0) {
   tf.util.assert(
       layerIndex >= 0, `Failed to find a convolutional layer in model`);
   
-  layerIndex = 17;
+  //layerIndex = 17;
   const lastConvLayer = model.layers[layerIndex];
 
   // Get "sub-model 1", which goes from the original input to the output
