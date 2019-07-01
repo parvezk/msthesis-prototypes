@@ -1,3 +1,7 @@
+/*
+* Webcam
+*/
+
 class WebCam {
 
     constructor(){
